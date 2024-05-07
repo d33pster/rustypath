@@ -1,0 +1,15 @@
+[package]
+name = "rustypath"
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/d33pster/rustypath"
+authors = ["Soumyo Deep Gupta <deep.main.ac@gmail.com>"]
+description = "Easily manage paths in rust"
+license-file = "LICENSE"
+readme = "README.md"
+keywords = ["rustypath", "d33pster", "path", "pathdev", "system paths", "path manager"]
+categories = ["filesystem"]
+
+
+[dependencies]
+dirs = "5.0.1"
