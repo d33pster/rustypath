@@ -7,7 +7,7 @@ authors = ["Soumyo Deep Gupta <deep.main.ac@gmail.com>"]
 description = "Easily manage paths in rust"
 license-file = "LICENSE"
 readme = "README.md"
-keywords = ["rustypath", "d33pster", "path", "system paths", "path manager"]
+keywords = ["rustypath", "d33pster", "path", "system-paths", "path-manager"]
 categories = ["filesystem"]
 
 
