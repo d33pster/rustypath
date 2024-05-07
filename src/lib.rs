@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::{env, path::{Path, PathBuf}};
 
 use dirs;
 
@@ -7,7 +7,7 @@ pub struct RPath{
 }
 
 impl RPath{
-    pub fn join(&self, p:String) -> RPath{
+    pub fn join(&self, p:&str) -> RPath{
         let newpath = self.path.clone().join(p);
         RPath { path: newpath }
     }
@@ -59,4 +59,21 @@ impl RPath{
         let path = self.path.as_path().canonicalize().unwrap();
         RPath{path}
     }
+
+    pub fn new_from_path(p: &Path) -> RPath {
+        let path = p.to_str().unwrap();
+        RPath::new_from(path)
+    }
+
+    pub fn new_from_pbuf(p: &PathBuf) -> RPath {
+        let path = match p.to_str() {
+            Some(p) => p.to_string(),
+            None => String::from(""),
+        };
+
+        
+        RPath::new_from(&path)
+    }
+
+
 }
