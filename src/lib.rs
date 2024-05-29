@@ -24,7 +24,10 @@ impl RPath{
     pub fn convert_optionpathbuf_to_pathbuf(p: Option<PathBuf>) -> PathBuf {
         let pbuf = match p{
             Some(pb) => pb,
-            None => PathBuf::new(),
+            None => {
+                eprintln!("Failed to convert option<pathbuf> to pathbuf");
+                std::process::exit(1);
+            },
         };
 
         pbuf
@@ -33,7 +36,10 @@ impl RPath{
     pub fn pwd() -> Self {
         let pwd: PathBuf = match env::current_dir() {
             Ok(value) => value,
-            Err(_err) => PathBuf::new(),
+            Err(_err) => {
+                eprintln!("Failed to get current dir.");
+                std::process::exit(1);
+            },
         };
 
         RPath {
@@ -56,19 +62,25 @@ impl RPath{
     }
 
     pub fn expand(&self) -> RPath {
-        let path = self.path.as_path().canonicalize().unwrap();
+        let path = self.path.as_path().canonicalize().unwrap_or_else(|error| {
+            eprintln!("Failed to expand path for {}: {}", &self.convert_to_string(), error);
+            std::process::exit(1);
+        });
         RPath{path}
     }
 
     pub fn new_from_path(p: &Path) -> RPath {
-        let path = p.to_str().unwrap();
+        let path = p.to_str().expect("Failed to conver to string");
         RPath::new_from(path)
     }
 
     pub fn new_from_pbuf(p: &PathBuf) -> RPath {
         let path = match p.to_str() {
             Some(p) => p.to_string(),
-            None => String::from(""),
+            None => {
+                eprintln!("Failed to convert path to string.");
+                std::process::exit(1);
+            },
         };
 
         
