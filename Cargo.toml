@@ -1,15 +1,20 @@
 [package]
 name = "rustypath"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 repository = "https://github.com/d33pster/rustypath"
 authors = ["Soumyo Deep Gupta <deep.main.ac@gmail.com>"]
-description = "Easily manage paths in rust"
+description = "Easily manage paths in rust. A straight-forward no bullshit crate to manage paths. Either you get what you want, or you dont."
 license-file = "LICENSE"
+license = "MIT"
 readme = "README.md"
 keywords = ["rustypath", "d33pster", "path", "system-paths", "path-manager"]
 categories = ["filesystem"]
 
-
 [dependencies]
 dirs = "5.0.1"
+
+[features]
+default = ["stable_feature"]
+stable_feature = []
+conversion = []
