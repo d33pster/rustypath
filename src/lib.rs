@@ -89,7 +89,13 @@ impl RPath{
 
     #[cfg(feature = "stable_feature")]
     pub fn gethomedir() -> Self {
-        RPath {path:RPath::convert_optionpathbuf_to_pathbuf(dirs::home_dir())}
+        let home = match dirs::home_dir() {
+            Some(a) => a,
+            None => {
+                eprintln!("Failed to get homedir.");
+                std::process::exit(1); },
+        };
+        RPath {path:RPath::new_from_pbuf(&home).convert_to_pathbuf()}
     }
 
     #[cfg(feature = "stable_feature")]
