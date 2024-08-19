@@ -1,3 +1,5 @@
+![Crates.io Total Downloads](https://img.shields.io/crates/d/rustypath?style=flat&logo=rust&logoColor=yellow&logoSize=auto&label=crates.io%20downloads)
+
 # rustypath
 
 Path crate for rust. Managing paths made easy.
@@ -9,7 +11,9 @@ Coverting and Managing paths in rust is now made easy.
 ## Table of contents
 
 - [Add to your project](#add-to-your-project)
+- [Features](#features)
 - [Usage](#usage)
+- [Issues](#issues)
 
 ## Add to your project
 
@@ -17,44 +21,239 @@ Coverting and Managing paths in rust is now made easy.
 cargo add rustypath
 ```
 
+## Features
+
+In `v1.0.0` and above, the code has been divided into features due to growing functionality. The features are listed below:
+
+  - `Creation`: This feature is kind of a default feature as this allows users to create a `RPath` struct from these -> [`String`, `&str`, `Path`, `PathBuf`].
+  - `Management`: This feature will be enabled by default and contains methods to manage/manipulate paths.
+  - `Conversion`: This feature contains all conversion methods from `RPath` to different path types.
+  - `Boolean`: This feature contains all boolean type methods for checks.
+
 ## Usage
 
-```rust
-use rustypath::RPath;
+- Importing
 
-// to create a new RPath
-let rpath = RPath::new_from("/abc");
+  ```rust
+  use rustypath::RPath; // for all basic functionalities.
+  ```
+  `Note:` Implementation includes -> [`Clone`, `Debug`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Hash`] and a custom trait for printing `RPath`.
+  ```rust
+  // for printing the path as it is, `Display` trait can be imported.
+  use rustypath::Display;
+  ```
 
-// to create from Path (std::path::Path)
-let demopath = Path::from("/abc");
-let rpath = RPath::new_from_path(demopath);
+- Creating `RPath`
 
-// to create from PathBuf
-let demopbuf = PathBuf::from("/abc");
-let rpath = RPath::new_from_pbuf(demopbuf);
+  - From `&str`, `Path` and `PathBuf`
+    ```rust
+    // to create a RPath
+    let rpath_str = RPath::from(value);
 
-// join more parts to it
-let new_r_path = rpath.join("bca"); //will return /abc/bca
+    // NOTE: value can be of type &str, Path (std::path::Path) or PathBuf (std::path::PathBuf)
 
-// convert to pathbuf
-let pbuf = rpath.convert_to_pathbuf();
+    // Examples:
+    let rpath = RPath::from("/temp");
+    let rpath_ = RPath::from(std::path::Path::new("/temp"));
+    let rpath__ = RPath::from(std::path::PathBuf::from("/temp"));
+    ```
 
-// convert to string
-let string = rpath.convert_to_string();
+  - Allocate an empty `RPath`
+    ```rust
+    let rpath_empty_or_new = RPath::new();
+    // this will allocate an empty RPath
+    ```
 
-// convert from relpath to abspath
-let abspath = rpath.expand()
+- Path Manipulation
 
-// convert from Option<PathBuf> to PathBuf
-// suppose u get some output in Option<Pathbuf> 
-let pbuf = RPath::convert_optionpathbuf_to_pbuf(p:Option<PathBuf>);
+  - Join
+    ```rust
+    // make a RPath
+    let rpath = RPath::from("/temp");
 
-// get current dir in RPath
-let current_working_dir = RPath::pwd();
+    // add childs to it,
+    let new = rpath.join("abc.txt");
+    new.print();
+    // this will print "/temp/abc.txt"
+    ```
 
-// get home dir in RPath
-let homedir = RPath::gethomedir();
+  - Join Multiple
+    ```rust
+    // make a RPath
+    let mut rpath = RPath::from("/temp");
 
-// get clone
-let rpath2 = rpath.clone();
-```
+    // suppose you want to add multiple components to the path
+    rpath.join_multiple(vec![value1, value2, ...]);
+    // here value1, value2 can be any of these types => [&str, Path, or PathBuf]
+    rpath.print();
+    // this will print -> "/temp/value1/value2/..."
+    ```
+  
+  - Basename/Filename
+    ```rust
+    // to get the basename or filename of the path:
+    let rpath: Rpath = RPath::from("/temp/abc.txt");
+    let basename: &str = rpath.basename();
+    ```
+
+  - Replace Basename
+    ```rust
+    // suppose there's a RPath -> "/temp/abc.txt" and
+    // you want to just replace "abc.txt" with "xyz.txt" without
+    // typing whole new full paths or rel paths, and just update using
+    // the existing one.
+
+    let rpath = RPath::from("/temp/abc.txt");
+    let rpath_ = rpath.with_basename("xyz.txt"); // this will be "/temp/xyz.txt" 
+    ```
+
+  - Dirname/Parent
+    ```rust
+    let rpath: RPath = RPath::from("/temp/abc.txt");
+
+    // to get the parent
+    let parent: RPath = rpath.dirname(); // this will be "/temp"
+    ```
+
+  - Replace Dirname/Parent
+    ```rust
+    // suppose there's a RPath -> "/temp/abc.txt" and
+    // you want to replace "/temp" with something else
+
+    let rpath: RPath = RPath::from("/temp/abc.txt");
+    let new = rpath.with_dirname("/temp/temp2"); // this will make it -> "/temp/temp2/abc.txt"
+    ```
+
+  - Extention
+    ```rust
+    // to get the extension of a file from the RPath
+    let rpath = RPath::from("/temp/abc.txt");
+
+    let extension: &str = rpath.extension();
+    // NOTE: this will print error and exit if filename doesn't have a extention or is a dir.
+    ```
+
+  - Expand
+    ```rust
+    let rpath = RPath::from("./temp");
+    let expanded = rpath.expand(); // this will expand if not full path, else it wont throw error.
+    // remeber that it will only expand the path if the path exits
+    // if "./temp" directory doesnt exist it will return "./temp"
+    ```
+
+  - Read_Dir (return an iterator with DirEntry)
+    ```rust
+    let rpath = RPath::from("/temp");
+
+    for entry in rpath.read_dir().expect("Failed to call read_dir") {
+        if let Ok(entry) = entry {
+            println!("{:?}", entry.path());
+        }
+    }
+    ```
+
+  - Get Current Working Directory
+    ```rust
+    let current_dr: RPath = RPath::pwd();
+    ```
+
+  - Get Home dir of your OS
+    ```rust
+    let home: RPath = RPath::gethomedir();
+    ```
+
+  - Clear the current RPath buffer
+    ```rust
+    let rpath = RPath::from("/temp");
+    rpath.clear(); // this will be equivalent to RPath::new();
+    ```
+
+- Conversion
+
+  - Convert to string
+    ```rust
+    let rpath = RPath::from("/abc");
+    let rpath_string = rpath.convert_to_string();
+    ```
+
+  - Convert to PathBuf
+    ```rust
+    let rpath = RPath::from("/abc");
+    let rpath_in_pathbuf = rpath.convert_to_pathbuf();
+    ```
+
+- Boolean
+
+  - exists
+    ```rust
+    let rpath = RPath::from("/abc");
+    if rpath.exists() {
+        // do something
+    }
+    ```
+
+  - is_dir/is_file
+    ```rust
+    let rpath = RPath::from("/abc");
+
+    if rpath.is_dir() {
+        // do something
+    } else if rpath.is_file() {
+        // do something
+    }
+    ```
+  Similarly, the following will work:
+
+  - is_absolute
+
+  - is_symlink
+
+  - is_relative
+
+- Printing
+
+  `RPath` supports printing as a single string.
+
+  To use the `.print()` function, import `Display` trait
+  ```rust
+  use rustypath::Display;
+  ```
+
+  Printing using `.print()` method.
+  ```rust
+  let rpath = RPath::gethomedir();
+  rpath.print();
+  // this will print `homedir` path in a single line.
+  ```
+
+  To print with other strings:
+  ```rust
+  let rpath = RPath::gethomedir();
+
+  println!("Homedir: {}", rpath.convert_to_string());
+  println!("{:?}", rpath);
+  ```
+
+- Operators
+
+  - Supports `==` and `!=` operators
+    ```rust
+    let rpath = RPath::pwd();
+    let rpath_ = RPath::gethomedir();
+
+    if rpath == rpath_ {
+        // do something
+    } else {
+        // do something else
+    }
+    ```
+
+- Supports Hash
+
+## Issues
+
+If any issues were found kindly add 'em [here](https://github.com/d33pster/rustypath/issues).
+
+## Pull Requests
+
+Pull requests are encouraged and can be added [here](https://github.com/d33pster/rustypath).
