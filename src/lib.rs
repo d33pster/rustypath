@@ -192,7 +192,7 @@ impl RPath{
     }
 
     /// 
-    /// Returns the `extension` of the basename if any.. else exits with error.
+    /// Returns the `extension` of the basename if any.. else returns the basename
     /// ### Usage
     /// ```
     /// use rustypath::RPath;
@@ -206,8 +206,10 @@ impl RPath{
     pub fn extension(&self) -> &str {
         let basename = self.basename();
         let parts: Vec<&str> = basename.split(".").collect();
-        if parts.len() == 2 {
-            parts[1]
+        if parts.len() >= 2 {
+            parts.last().unwrap()
+        } else if parts.len() == 1 {
+            self.basename()
         } else {
             eprintln!("Filename extension not found.");
             std::process::exit(1);
