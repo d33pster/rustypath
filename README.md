@@ -130,7 +130,8 @@ In `v1.0.0` and above, the code has been divided into features due to growing fu
     let rpath = RPath::from("/temp/abc.txt");
 
     let extension: &str = rpath.extension();
-    // NOTE: this will print error and exit if filename doesn't have a extention or is a dir.
+    // NOTE: this will return either extension (if present) or the basename.
+    // if path is invalid it will print error and exit.
     ```
 
   - Expand
